@@ -1,0 +1,44 @@
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: silent
+external-controller: 127.0.0.1:9090
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:53
+  enhanced-mode: redir-host
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  fallback:
+    - https://1.0.0.1/dns-query
+    - https://8.8.4.4/dns-query
+    - 1.1.1.1
+    - 8.8.8.8
+proxies:
+   - {"type":"vmess","name":"Iran","ws-opts":{"path":"/graphql"},"server":"5.61.29.70","port":"443","uuid":"0690368e-43cc-11ed-b878-0242ac120002","alterId":"0","cipher":"auto","network":"ws"}
+   - {"type":"vmess","name":"Netherland","ws-opts":{"path":"/graphql"},"server":"185.73.115.212","port":"443","uuid":"0690368e-43cc-11ed-b878-0242ac120002","alterId":"0","cipher":"auto","network":"ws"}
+
+proxy-groups:
+  - name: 🔆 LIST
+    type: select
+    proxies:
+      - Iran
+      - Netherland
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+ 
+ 
+rules:
+  - DOMAIN-SUFFIX,ad.com,REJECT
+  - MATCH,🔆 LIST
+  - IP-CIDR,8.8.8.8/32,🔆 LIST
+  - IP-CIDR,8.8.4.4/32,🔆 LIST
+  - IP-CIDR,1.1.1.1/32,🔆 LIST
+  - IP-CIDR,1.0.0.1/32,🔆 LIST
+  - SRC-IP-CIDR,192.168.1.201/32,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
